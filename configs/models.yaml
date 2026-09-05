@@ -1,0 +1,29 @@
+# SatQuery model registry
+#
+# Do not add a model here until its modality, input assumptions,
+# task, license, hardware requirements, and benchmark evidence
+# have been evaluated.
+
+models: []
+
+# Example structure:
+#
+# - id: example-model
+#   checkpoint: organization/model-name
+#   version: "..."
+#   task: classification
+#   modalities:
+#     - sentinel-2
+#   input:
+#     bands: []
+#     size: null
+#   license: ""
+#   hardware:
+#     vram_gb: null
+#   performance:
+#     latency_ms: null
+#   benchmark:
+#     source: ""
+#     notes: ""
+#   status: candidate
+#   role: ""

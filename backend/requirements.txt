@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+python-multipart
+rasterio
+geopandas
+shapely
+pydantic
+sqlalchemy
+alembic
+pytest
+psycopg2-binary
+python-dotenv
+supabase
