@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime
+from sqlalchemy import Column, String, Float, DateTime, JSON
 from .database import Base
 import datetime
 
@@ -14,4 +14,5 @@ class Scene(Base):
     height = Column(Float)
     source_uri = Column(String)
     status = Column(String)
+    bands_metadata = Column(JSON, default=list)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

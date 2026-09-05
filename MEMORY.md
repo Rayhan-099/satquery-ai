@@ -19,9 +19,12 @@
 - **Infrastructure:** The MVP should remain a modular monolith rather than unnecessary microservices. No Kubernetes or generic cloud overhead unless proven necessary.
 
 ## Current Implementation State
-- Next.js and FastAPI initialized.
-- Supabase architecture migration in progress.
-- GeoTIFF upload and basic Rasterio metadata extraction implemented.
+- Next.js and FastAPI initialized and migrated to Supabase.
+- Phase 2 Deterministic EO Pipeline implemented: 
+  - GeoTIFF upload and metadata/bands extraction robustly implemented.
+  - NDVI engine handles zero-division, nodata masks, and generates scientific GeoTIFFs alongside lightweight PNG overlays.
+  - Frontend features a dark-mode Leaflet MapViewer overlaying NDVI results with bounding-box precision.
+  - End-to-end testing verifies raster math and spatial bounds handling.
 
 ## Active Models
 - *None currently integrated.*

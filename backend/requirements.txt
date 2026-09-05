@@ -11,3 +11,4 @@ pytest
 psycopg2-binary
 python-dotenv
 supabase
+matplotlib
