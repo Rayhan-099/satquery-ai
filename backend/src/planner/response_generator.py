@@ -1,8 +1,27 @@
 from typing import Dict, Any
+import logging
 from .models import AnalysisPlan
+from ..ml import ModelGateway, EvidenceValidator
+
+logger = logging.getLogger(__name__)
 
 class ResponseGenerator:
+    def __init__(self):
+        self.gateway = ModelGateway()
+        self.validator = EvidenceValidator()
+
     def generate(self, plan: AnalysisPlan, evidence: Dict[str, Any]) -> str:
+        # 1. Attempt model-assisted generation
+        model_output = self.gateway.interpret_evidence(evidence)
+        if model_output:
+            # 2. Validate grounding
+            if self.validator.validate_claims(model_output, evidence):
+                return model_output
+            else:
+                logger.warning("Hallucination detected in model output. Falling back to deterministic.")
+                logger.debug(f"Rejected model output: {model_output}")
+                
+        # 3. Deterministic Fallback
         analysis_type = evidence.get("analysis_type", "")
         stats = evidence.get("statistics", {})
         

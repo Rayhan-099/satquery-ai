@@ -31,9 +31,14 @@
   - Developed NDWI (Water Detection) and dual-pol Sentinel-1 SAR Backscatter pipelines.
   - Tools `water_index` and `sar_analysis` fully registered and orchestrated.
   - Established the `benchmark_queries.json` framework for future evaluation.
+- Phase 5 Complete:
+  - SatQuery now features a full UI with geospatial map overlays, multi-band GeoTIFF ingestion, rule-based query understanding, NDWI computation, SAR dual-pol (VV/VH) processing, and model-assisted natural language interpretation via a local LLM (`SmolLM-135M`).
+  - A custom `EvidenceValidator` intercepts and prevents numerical hallucinations.
+  - All commits are synced to `https://github.com/Rayhan-099/satquery-ai`.
+  - A robust end-to-end Playwright test suite verifies UI query capabilities.
 
 ## Active Models
-- *None currently integrated (using RuleBasedPlanner for deterministic query routing).*
+- *SmolLM-135M (integrated for local natural language interpretation).*
 
 ## Important Environment / Setup
 - **Dependencies:** Python 3.11+, Node 20+.
