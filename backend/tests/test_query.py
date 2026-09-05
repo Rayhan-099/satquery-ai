@@ -15,10 +15,22 @@ def test_rule_based_planner_supported():
 def test_rule_based_planner_unsupported():
     planner = RuleBasedPlanner()
     with pytest.raises(ValueError, match="UNSUPPORTED_ANALYSIS"):
-        planner.generate_plan("test_scene_123", "Show me the water bodies.")
+        planner.generate_plan("test_scene_123", "Show me the building footprints.")
         
     with pytest.raises(ValueError, match="UNSUPPORTED_ANALYSIS"):
-        planner.generate_plan("test_scene_123", "Analyze SAR data for change.")
+        planner.generate_plan("test_scene_123", "Analyze data for change.")
+
+def test_rule_based_planner_water():
+    planner = RuleBasedPlanner()
+    plan = planner.generate_plan("scene", "Where is the water?")
+    assert plan.intent == "water_analysis"
+    assert plan.tool == "water_index"
+
+def test_rule_based_planner_sar():
+    planner = RuleBasedPlanner()
+    plan = planner.generate_plan("scene", "Analyze SAR data")
+    assert plan.intent == "sar_analysis"
+    assert plan.tool == "sar_analysis"
 
 def test_rule_based_planner_unrecognized():
     planner = RuleBasedPlanner()

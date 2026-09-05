@@ -25,7 +25,12 @@
   - Natural Language Chat interface fully functional.
   - Pluggable `AnalysisTool` registry implemented with `ndvi` wrapped as the first tool.
   - Deterministic `RuleBasedPlanner` correctly routes Vegetation queries to the NDVI execution engine, mapping optical bands correctly and generating grounded text from statistical evidence.
-  - Architecture fully prepared for an LLM provider drop-in (Phase 4).
+  - Architecture fully prepared for an LLM provider drop-in.
+- Phase 4 Multimodal EO Intelligence & Real Analytical Tools implemented:
+  - Documented Model Selection strategy favoring deterministic scientific capability over generic VLMs to guarantee SAR and spatial accuracy without hallucination.
+  - Developed NDWI (Water Detection) and dual-pol Sentinel-1 SAR Backscatter pipelines.
+  - Tools `water_index` and `sar_analysis` fully registered and orchestrated.
+  - Established the `benchmark_queries.json` framework for future evaluation.
 
 ## Active Models
 - *None currently integrated (using RuleBasedPlanner for deterministic query routing).*

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "q_001",
+    "scene_type": "optical",
+    "query": "Where is the water?",
+    "expected_intent": "water_analysis",
+    "expected_tool": "water_index",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_002",
+    "scene_type": "optical",
+    "query": "Calculate NDVI for this region.",
+    "expected_intent": "vegetation_analysis",
+    "expected_tool": "ndvi",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_003",
+    "scene_type": "sar",
+    "query": "Analyze the SAR response.",
+    "expected_intent": "sar_analysis",
+    "expected_tool": "sar_analysis",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_004",
+    "scene_type": "any",
+    "query": "What changed between these images?",
+    "expected_intent": "unsupported",
+    "expected_tool": "none",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q_005",
+    "scene_type": "any",
+    "query": "Find the buildings in this image.",
+    "expected_intent": "unsupported",
+    "expected_tool": "none",
+    "difficulty": "medium"
+  }
+]
