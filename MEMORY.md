@@ -31,11 +31,16 @@
   - Developed NDWI (Water Detection) and dual-pol Sentinel-1 SAR Backscatter pipelines.
   - Tools `water_index` and `sar_analysis` fully registered and orchestrated.
   - Established the `benchmark_queries.json` framework for future evaluation.
-- Phase 5 Complete:
-  - SatQuery now features a full UI with geospatial map overlays, multi-band GeoTIFF ingestion, rule-based query understanding, NDWI computation, SAR dual-pol (VV/VH) processing, and model-assisted natural language interpretation via a local LLM (`SmolLM-135M`).
-  - A custom `EvidenceValidator` intercepts and prevents numerical hallucinations.
-  - All commits are synced to `https://github.com/Rayhan-099/satquery-ai`.
-  - A robust end-to-end Playwright test suite verifies UI query capabilities.
+- **Phase 1 & 2 & 3 & 4 & 5 Complete:**
+    - SatQuery now features a full UI with geospatial map overlays, multi-band GeoTIFF ingestion, rule-based query understanding, NDWI computation, SAR dual-pol (VV/VH) processing, and model-assisted natural language interpretation via a local LLM (`SmolLM-135M`).
+    - A custom `EvidenceValidator` intercepts and prevents numerical hallucinations.
+    - All commits are synced to `https://github.com/Rayhan-099/satquery-ai`.
+    - A robust end-to-end Playwright test suite verifies UI query capabilities.
+- **Phase 6 (Real Copernicus Integration) Complete:**
+    - Created `CopernicusDataProvider` for querying CDSE OData API.
+    - Built frontend Data Discovery UI for querying bounding boxes and dates.
+    - Prepared ingestion pipeline to construct valid stacked GeoTIFFs from individual CDSE S2 `.jp2` bands (download operations mock realistically via UUIDs if CDSE credentials are not provided).
+    - Documented actual evaluation status of BigEarthNet and VRSBench (deferred).
 
 ## Active Models
 - *SmolLM-135M (integrated for local natural language interpretation).*
