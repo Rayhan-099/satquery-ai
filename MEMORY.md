@@ -20,14 +20,15 @@
 
 ## Current Implementation State
 - Next.js and FastAPI initialized and migrated to Supabase.
-- Phase 2 Deterministic EO Pipeline implemented: 
-  - GeoTIFF upload and metadata/bands extraction robustly implemented.
-  - NDVI engine handles zero-division, nodata masks, and generates scientific GeoTIFFs alongside lightweight PNG overlays.
-  - Frontend features a dark-mode Leaflet MapViewer overlaying NDVI results with bounding-box precision.
-  - End-to-end testing verifies raster math and spatial bounds handling.
+- Phase 2 Deterministic EO Pipeline implemented (NDVI).
+- Phase 3 Natural-Language Query Orchestration implemented:
+  - Natural Language Chat interface fully functional.
+  - Pluggable `AnalysisTool` registry implemented with `ndvi` wrapped as the first tool.
+  - Deterministic `RuleBasedPlanner` correctly routes Vegetation queries to the NDVI execution engine, mapping optical bands correctly and generating grounded text from statistical evidence.
+  - Architecture fully prepared for an LLM provider drop-in (Phase 4).
 
 ## Active Models
-- *None currently integrated.*
+- *None currently integrated (using RuleBasedPlanner for deterministic query routing).*
 
 ## Important Environment / Setup
 - **Dependencies:** Python 3.11+, Node 20+.
