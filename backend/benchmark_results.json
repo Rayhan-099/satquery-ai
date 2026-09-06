@@ -1,0 +1,66 @@
+{
+  "results": [
+    {
+      "query_id": "s2_opt_001",
+      "category": "optical",
+      "passed": true,
+      "actual_intent": "vegetation_analysis",
+      "actual_tool": "ndvi",
+      "latency_ms": 11938.400983810425
+    },
+    {
+      "query_id": "s2_opt_002",
+      "category": "optical",
+      "passed": true,
+      "actual_intent": "water_analysis",
+      "actual_tool": "water_index",
+      "latency_ms": 4983.070135116577
+    },
+    {
+      "query_id": "s1_sar_001",
+      "category": "sar",
+      "passed": true,
+      "actual_intent": "sar_analysis",
+      "actual_tool": "sar_analysis",
+      "latency_ms": 4842.46039390564
+    },
+    {
+      "query_id": "cross_001",
+      "category": "cross-modal",
+      "passed": true,
+      "actual_intent": "CLARIFICATION_REQUIRED: Scene does not contain explicitly identifiable VV and VH dual-pol bands for SAR Analysis.",
+      "actual_tool": "none",
+      "latency_ms": 4.415988922119141
+    },
+    {
+      "query_id": "temp_001",
+      "category": "temporal",
+      "passed": true,
+      "actual_intent": "UNSUPPORTED_ANALYSIS: This query requires tools not currently registered.",
+      "actual_tool": "none",
+      "latency_ms": 3.405332565307617
+    },
+    {
+      "query_id": "adv_001",
+      "category": "adversarial",
+      "passed": true,
+      "actual_intent": "UNSUPPORTED_ANALYSIS: This query requires tools not currently registered.",
+      "actual_tool": "none",
+      "latency_ms": 3.4644603729248047
+    },
+    {
+      "query_id": "adv_002",
+      "category": "adversarial",
+      "passed": true,
+      "actual_intent": "UNRECOGNIZED_INTENT: Could not determine an appropriate analysis tool for this query.",
+      "actual_tool": "none",
+      "latency_ms": 3.9229393005371094
+    }
+  ],
+  "metrics": {
+    "total": 7,
+    "passed": 7,
+    "median_latency_ms": 4.415988922119141,
+    "p95_latency_ms": 11938.400983810425
+  }
+}

@@ -1,42 +1,79 @@
 [
   {
-    "id": "q_001",
-    "scene_type": "optical",
-    "query": "Where is the water?",
-    "expected_intent": "water_analysis",
-    "expected_tool": "water_index",
-    "difficulty": "easy"
-  },
-  {
-    "id": "q_002",
-    "scene_type": "optical",
-    "query": "Calculate NDVI for this region.",
-    "expected_intent": "vegetation_analysis",
+    "id": "s2_opt_001",
+    "modality": "sentinel-2",
+    "category": "optical",
+    "task": "vegetation",
+    "query": "Where is the vegetation strongest in this scene?",
     "expected_tool": "ndvi",
-    "difficulty": "easy"
+    "expected_intent": "vegetation_analysis",
+    "expected_behavior": "analysis",
+    "expected_rejection": false
   },
   {
-    "id": "q_003",
-    "scene_type": "sar",
-    "query": "Analyze the SAR response.",
-    "expected_intent": "sar_analysis",
+    "id": "s2_opt_002",
+    "modality": "sentinel-2",
+    "category": "optical",
+    "task": "water",
+    "query": "Can you highlight the water bodies?",
+    "expected_tool": "water_index",
+    "expected_intent": "water_analysis",
+    "expected_behavior": "analysis",
+    "expected_rejection": false
+  },
+  {
+    "id": "s1_sar_001",
+    "modality": "sentinel-1",
+    "category": "sar",
+    "task": "backscatter",
+    "query": "Analyze the SAR backscatter for this area.",
     "expected_tool": "sar_analysis",
-    "difficulty": "easy"
+    "expected_intent": "sar_analysis",
+    "expected_behavior": "analysis",
+    "expected_rejection": false
   },
   {
-    "id": "q_004",
-    "scene_type": "any",
-    "query": "What changed between these images?",
-    "expected_intent": "unsupported",
+    "id": "cross_001",
+    "modality": "cross-modal",
+    "category": "cross-modal",
+    "task": "fusion",
+    "query": "Combine the SAR backscatter with the optical vegetation index.",
     "expected_tool": "none",
-    "difficulty": "medium"
+    "expected_intent": "UNRECOGNIZED_INTENT",
+    "expected_behavior": "rejection",
+    "expected_rejection": true
   },
   {
-    "id": "q_005",
-    "scene_type": "any",
-    "query": "Find the buildings in this image.",
-    "expected_intent": "unsupported",
+    "id": "temp_001",
+    "modality": "temporal",
+    "category": "temporal",
+    "task": "change",
+    "query": "What changed between this image and last year?",
     "expected_tool": "none",
-    "difficulty": "medium"
+    "expected_intent": "UNSUPPORTED_ANALYSIS",
+    "expected_behavior": "rejection",
+    "expected_rejection": true
+  },
+  {
+    "id": "adv_001",
+    "modality": "any",
+    "category": "adversarial",
+    "task": "counting",
+    "query": "How many buildings are in this scene?",
+    "expected_tool": "none",
+    "expected_intent": "UNSUPPORTED_ANALYSIS",
+    "expected_behavior": "rejection",
+    "expected_rejection": true
+  },
+  {
+    "id": "adv_002",
+    "modality": "any",
+    "category": "adversarial",
+    "task": "species",
+    "query": "What exact crop species are growing here?",
+    "expected_tool": "none",
+    "expected_intent": "UNRECOGNIZED_INTENT",
+    "expected_behavior": "rejection",
+    "expected_rejection": true
   }
 ]

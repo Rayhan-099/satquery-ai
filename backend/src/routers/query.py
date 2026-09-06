@@ -37,7 +37,7 @@ async def process_query(request: QueryRequest, db: Session = Depends(get_db)):
         
     except ValueError as e:
         err_msg = str(e)
-        if err_msg.startswith("UNSUPPORTED_ANALYSIS"):
+        if err_msg.startswith("UNSUPPORTED_ANALYSIS") or err_msg.startswith("UNRECOGNIZED_INTENT"):
             return QueryResponse(
                 query=request.query,
                 status="unsupported",
