@@ -9,9 +9,13 @@ app = FastAPI(
     version="0.1.0"
 )
 
+import os
+
+frontend_url = os.getenv("FRONTEND_URL", "*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # TODO: configure this properly for production
+    allow_origins=[frontend_url] if frontend_url != "*" else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

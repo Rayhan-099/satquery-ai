@@ -33,8 +33,9 @@ Unlike a generic LLM which would hallucinate an answer, SatQuery's orchestrator 
 - **Data Engine:** Rasterio, NumPy, Shapely
 - **Generative AI:** SmolLM-135M-Instruct (used *strictly* for text interpretation)
 
-## Getting Started
-Please see the [Demo Setup Guide](./docs/DEMO_SETUP.md) for one-command installation instructions to run the SIH prototype locally.
+## Deployment & Setup
+- **Local Development:** Please see the [Demo Setup Guide](./docs/DEMO_SETUP.md) for one-command installation instructions to run the SIH prototype locally.
+- **Production Deployment:** Please see the [Deployment Guide](./docs/DEPLOYMENT.md) for instructions on deploying the Dockerized backend and Vercel frontend.
 
 ## Project History
 SatQuery AI was developed over 10 strict engineering phases, emphasizing scientific validity, robustness, and deterministic design over hyped AI features. For the full engineering history, see `MEMORY.md`.
