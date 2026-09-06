@@ -13,7 +13,8 @@ export default function Home() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"upload" | "discovery">("upload");
   
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  // Do NOT remove the existing NEXT_PUBLIC_API_URL until verified
+  const API_URL = '/api'; // process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
   
   // Discovery State
   const [bbox, setBbox] = useState("12.45, 41.89, 12.55, 41.95");
