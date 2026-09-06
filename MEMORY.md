@@ -26,31 +26,31 @@ Spatial visualization
 Follow-up question
 ```
 
-## Current Architecture
-- **Frontend:** Next.js 15, React, Tailwind CSS (IMPLEMENTED)
-- **Map:** Leaflet/React-Leaflet used for spatial bounds and visualization (IMPLEMENTED)
-- **Backend:** FastAPI (Python) (IMPLEMENTED)
-- **Database:** PostgreSQL on Supabase accessed via SQLAlchemy / Alembic (IMPLEMENTED). SQLite fallback strictly deprecated.
-- **Data Pipeline:** Rasterio, NumPy, Shapely for deterministic geospatial computation (IMPLEMENTED)
-- **Local Storage:** Ephemeral artifact storage for raster processing (IMPLEMENTED)
-- **Copernicus Data Provider (CDSE):** OData and Keycloak implemented (IMPLEMENTED - Phase 7 fix)
-- **Models:** SmolLM-135M-Instruct via local HF Transformers, used solely for semantic interpretation, not science (IMPLEMENTED)
+## Final Architecture
+- **Frontend:** Next.js 15, React, Tailwind CSS (VERIFIED)
+- **Map:** Leaflet/React-Leaflet used for spatial bounds and visualization (VERIFIED)
+- **Backend:** FastAPI (Python) (VERIFIED)
+- **Database:** PostgreSQL on Supabase accessed via SQLAlchemy / Alembic (VERIFIED). SQLite fallback strictly deprecated.
+- **Data Pipeline:** Rasterio, NumPy, Shapely for deterministic geospatial computation (VERIFIED)
+- **Local Storage:** Ephemeral artifact storage on disk for raster processing (VERIFIED)
+- **Copernicus Data Provider (CDSE):** OData and Keycloak implemented (PARTIAL - Falls back to synthetic locally due to missing prod credentials)
+- **Models:** SmolLM-135M-Instruct via local HF Transformers, used solely for semantic interpretation, not science (VERIFIED)
 - **Authentication (User):** Keycloak/Supabase Auth (DEFERRED)
 - **Datasets (BigEarthNet / VRSBench):** (DEFERRED)
 
-## Current Implementation State
-- **Phase 1 (COMPLETE):** Initial FastAPI backend, scene ingestion, Rasterio metadata extraction, upload flow.
-- **Supabase Architecture Setup (COMPLETE):** PostgreSQL migration, `.env` security, `AGENTS.md` rules, Playwright tests.
-- **Phase 2 (COMPLETE):** Band semantics enforced. Optical NDVI pipeline implemented with GeoTIFF outputs and PNG visualization.
-- **Phase 3 (COMPLETE):** Query orchestrator implemented (`query → planner → plan → executor → tool → evidence → response`). Type-safe `AnalysisPlan` and `RuleBasedPlanner` with unsupported-query handling.
-- **Phase 4 (COMPLETE):** Multimodal EO intelligence. NDWI (water) and Sentinel-1 SAR dual-pol (VV/VH) backscatter pipelines implemented.
-- **Phase 5 (COMPLETE):** Model gateway with SmolLM-135M-Instruct. Evidence-number validation and deterministic fallback if hallucination occurs. 
-- **Phase 6 (COMPLETE):** `CopernicusDataProvider` fetching CDSE OData API. Data discovery UI allows querying by bbox and dates.
-- **Phase 7 (COMPLETE):** Real CDSE ingestion implemented with Keycloak Auth token fetching and OData `$value` raster extraction. Strict fallback to `SYNTHETIC_FIXTURE` if credentials are missing to keep demos intact. Provenance tracking implemented in DB and UI.
-- **Phase 8 (COMPLETE):** End-to-end evaluation benchmark suite built. 7 curated categories (Optical, SAR, Cross-modal, Temporal, Adversarial) evaluated against deterministic baseline. ML Gateway correctly falls back on hallucinations. Orchestrator accurately rejects unsupported capabilities.
-- **Phase 9 (COMPLETE):** SIH Demo Readiness achieved. UI polished with skeleton loaders, query suggestions, clean unsupported capability responses, and Playwright Golden Path E2E verification. Added `DEMO_GUIDE.md` and `CAPABILITY_MATRIX.md`.
+## Phase History
+- **Phase 1 (IMPLEMENTED):** Initial FastAPI backend, scene ingestion, Rasterio metadata extraction, upload flow.
+- **Phase 2 (IMPLEMENTED):** Band semantics enforced. Optical NDVI pipeline implemented with GeoTIFF outputs and PNG visualization.
+- **Phase 3 (IMPLEMENTED):** Query orchestrator implemented (`query → planner → plan → executor → tool → evidence → response`). Type-safe `AnalysisPlan` and `RuleBasedPlanner` with unsupported-query handling.
+- **Phase 4 (IMPLEMENTED):** Multimodal EO intelligence. NDWI (water) and Sentinel-1 SAR dual-pol (VV/VH) backscatter pipelines implemented.
+- **Phase 5 (IMPLEMENTED):** Model gateway with SmolLM-135M-Instruct. Evidence-number validation and deterministic fallback if hallucination occurs. 
+- **Phase 6 (IMPLEMENTED):** `CopernicusDataProvider` fetching CDSE OData API. Data discovery UI allows querying by bbox and dates.
+- **Phase 7 (IMPLEMENTED):** Real CDSE ingestion implemented with Keycloak Auth token fetching and OData `$value` raster extraction. Strict fallback to `SYNTHETIC_FIXTURE`. Provenance tracking implemented in DB and UI.
+- **Phase 8 (VERIFIED):** End-to-end evaluation benchmark suite built. 7 curated categories evaluated against deterministic baseline. ML Gateway correctly falls back on hallucinations. Orchestrator accurately rejects unsupported capabilities.
+- **Phase 9 (VERIFIED):** SIH Demo Readiness achieved. UI polished with skeleton loaders, query suggestions, clean unsupported capability responses, and Playwright Golden Path E2E verification. Added `DEMO_GUIDE.md` and `CAPABILITY_MATRIX.md`.
+- **Phase 10 (VERIFIED):** Final Engineering Audit. Security check passed. Dependency audit passed. Playwright E2E and Pytest (11/11) passing. Phase 8 Benchmark passing 100%. `PERFORMANCE.md` established. `SIH_JUDGE_QA.md` finalized. Final SIH submission status confirmed.
 
-## What Actually Works
+## Final Capabilities (Verified)
 - Local GeoTIFF ingestion with metadata extraction.
 - Natural language querying of scene features (Vegetation, Water).
 - Deterministic NDVI and NDWI calculations with spatial heatmaps.
@@ -60,31 +60,50 @@ Follow-up question
 - Scientific accuracy benchmarking via `run_benchmark.py`.
 - End-to-end Playwright tests on frontend query UI.
 
-## What Is Synthetic
-- CDSE Asset Download if `CDSE_USERNAME` and `CDSE_PASSWORD` are missing from `.env` will fallback to copying `dummy_multispectral.tif` or `dummy_sar.tif`, marking its source explicitly as `SYNTHETIC_FIXTURE` in the UI to avoid misleading users.
-- Phase 8 Benchmarks were run entirely on these `SYNTHETIC_FIXTURE` files to guarantee deterministic CI testability without relying on third-party Keycloak servers during standard runs.
+## Real Data
+- **Sentinel-1**: End-to-end processing logic works (VV/VH extraction), but CDSE payload fetching defaults to `SYNTHETIC_FIXTURE` if `.env` lacks active credentials.
+- **Sentinel-2**: Same behavior. OData logic verified, but large payload fetching defaults to `SYNTHETIC_FIXTURE`.
 
-## What Uses Real Copernicus Data
-- Keycloak-authenticated CDSE downloads use the real OData `$value` endpoint to fetch the product, marked as `REAL_COPERNICUS`. (Requires valid credentials).
+## Synthetic Data
+- `dummy_multispectral.tif` and `dummy_sar.tif` act as resilient offline fallback fixtures. All benchmark cases and standard dev environment demos rely on these for instant, reliable validation.
 
-## What Is Deferred
-- External User Authentication & RLS.
-- Training/Evaluation on BigEarthNet and VRSBench.
-- Persistent Cloud Storage (Supabase Storage) for TIFFs.
-- Cross-modal true fusion (currently evaluates independently).
-- Temporal change detection over time-series data.
+## Generative AI
+- **Planner**: `RuleBasedPlanner` (Deterministic intent extraction mapping NLP to code).
+- **Model**: `SmolLM-135M-Instruct` (Strictly used as a translation layer from statistical evidence to English).
+- **Validation**: `EvidenceValidator` extracts generated numbers via Regex and compares them to actual Python floats.
+- **Fallback**: If numbers don't match, system discards the LLM entirely and prints: *"Evidence-based result: The generative explanation could not be reliably grounded..."*
 
-## Current Tests
-- `pytest` suite covers backend EO algorithms, query planner, and the mock CDSE provider endpoints. 
-- `run_benchmark.py` covers E2E orchestration and NLP intent classification over `benchmark_queries.json`.
-- `playwright` covers E2E search, query, and fallback UI states (Golden Path verified).
+## Evaluation
+- **Benchmark**: 7/7 tests pass across 5 domains.
+- **Pytest**: 11/11 tests pass.
+- **Playwright**: Golden Path workflow passes perfectly.
+- **Security**: No tokens or passwords leaked in Git history. `.env` strictly ignored.
+
+## Performance
+- **Planner Refusals**: ~4 ms
+- **EO Analysis (NDVI)**: ~200 - 450 ms
+- **LLM Cold Start**: ~23.4 sec
+- **LLM Hot Inference**: ~3 - 5 sec
+- *(See `PERFORMANCE.md` for full hardware breakdown)*
+
+## Demo
+- Recommended workflow detailed in `docs/DEMO_GUIDE.md` utilizing Local Upload of `dummy_multispectral.tif` to showcase provenance, analysis, and safety fallback in 3 distinct steps.
+
+## Judge Questions
+- All potential SIH Judge critiques recorded and answered in `docs/SIH_JUDGE_QA.md`. The strategy focuses on scientific rigor over flashy, hallucinatory LLM features.
 
 ## Known Limitations
-- The CDSE OData `$value` download pulls the entire SAFE archive, which is very slow/large. In production, a node-traversal logic should extract only necessary `.jp2` files, but for the MVP without guaranteed credentials, the current fallback structure is used.
-- SmolLM-135M is very small and occasionally struggles with complex interpretations, relying on the deterministic fallback. (As proven in Phase 8, it hallucinates numbers on all complex tasks, correctly forcing the deterministic fallback every time). This is fully handled in the UI gracefully as "Evidence-based result".
+- CDSE API `$value` downloads the entire `.SAFE` archive, which is 1GB+ per scene.
+- Small LLM (135M) struggles with zero-shot interpretation, relying heavily on the robust deterministic validation net.
 
-## Next Recommended Phase
-- **READY FOR SIH PRESENTATION.** SatQuery AI has achieved the goals set out for the MVP. It deterministically analyzes multimodal satellite data, tracks provenance, validates generative output, and safely rejects impossible tasks. It is fully ready for the SIH 2026 hackathon demonstration.
+## Deferred Work
+- True multimodal joint fusion (S1+S2 processed together).
+- Temporal change detection over time series.
+- BigEarthNet fine-tuning.
+- User Authentication (RLS) via Supabase.
+
+## Final Status
+- **SIH DEMO READY**
 
 ## Last Updated
 - 2026-09-06
