@@ -39,6 +39,8 @@ async def upload_image(file: UploadFile = File(...), db: Session = Depends(get_d
         width=metadata["width"],
         height=metadata["height"],
         source_uri=file_path,
+        source_type="LOCAL_UPLOAD",
+        provenance={"description": "Locally uploaded by user"},
         bands_metadata=metadata["bands_metadata"],
         status="processing"
     )

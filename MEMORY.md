@@ -1,58 +1,83 @@
 # MEMORY.md: SatQuery AI
 
 ## Project Identity
-- **Name:** SatQuery AI (SIH26167)
+- **Project:** SatQuery AI
+- **Context:** SIH 2026 / ISRO-SAC context (Problem Statement: SIH26167)
 - **Goal:** Multimodal remote-sensing analysis via natural-language query interface.
 - **Core Value:** Evidence-grounded responses over LLM guesses.
 
-## Current Architecture
-- **Frontend:** Next.js 15, React, Tailwind CSS (strict AWESOMEDESIGN rules apply).
-- **Backend:** FastAPI (Python).
-- **Database:** PostgreSQL hosted on Supabase (accessed via SQLAlchemy).
-- **Geospatial Pipeline:** Rasterio, Shapely, GeoPandas for deterministic analysis.
-- **Data Layer:** Local ephemeral storage for raster processing, migrating to Supabase Storage for persistent assets.
+SatQuery is an evidence-grounded natural-language copilot for exploring, comparing, and interpreting multimodal satellite imagery.
+The core interaction is:
+```
+Scene
+  ↓
+Natural-language question
+  ↓
+Query planner
+  ↓
+EO analysis tools
+  ↓
+Evidence
+  ↓
+Reasoning / response generation
+  ↓
+Spatial visualization
+  ↓
+Follow-up question
+```
 
-## Important Decisions
-- **Database:** Supabase/PostgreSQL is the primary database platform. SQLite is deprecated for this project.
-- **Modality Semantics:** Sentinel-1 (SAR) and Sentinel-2 (Optical) remain semantically distinct. Do NOT merge them into generic RGB arrays blindly.
-- **Evidence-producing tools:** Preferred over LLM guesses. The LLM is a planner/reasoning layer, not the scientific computation engine.
-- **Infrastructure:** The MVP should remain a modular monolith rather than unnecessary microservices. No Kubernetes or generic cloud overhead unless proven necessary.
+## Current Architecture
+- **Frontend:** Next.js 15, React, Tailwind CSS (IMPLEMENTED)
+- **Map:** Leaflet/React-Leaflet used for spatial bounds and visualization (IMPLEMENTED)
+- **Backend:** FastAPI (Python) (IMPLEMENTED)
+- **Database:** PostgreSQL on Supabase accessed via SQLAlchemy / Alembic (IMPLEMENTED). SQLite fallback strictly deprecated.
+- **Data Pipeline:** Rasterio, NumPy, Shapely for deterministic geospatial computation (IMPLEMENTED)
+- **Local Storage:** Ephemeral artifact storage for raster processing (IMPLEMENTED)
+- **Copernicus Data Provider (CDSE):** OData and Keycloak implemented (IMPLEMENTED - Phase 7 fix)
+- **Models:** SmolLM-135M-Instruct via local HF Transformers, used solely for semantic interpretation, not science (IMPLEMENTED)
+- **Authentication (User):** Keycloak/Supabase Auth (DEFERRED)
+- **Datasets (BigEarthNet / VRSBench):** (DEFERRED)
 
 ## Current Implementation State
-- Next.js and FastAPI initialized and migrated to Supabase.
-- Phase 2 Deterministic EO Pipeline implemented (NDVI).
-- Phase 3 Natural-Language Query Orchestration implemented:
-  - Natural Language Chat interface fully functional.
-  - Pluggable `AnalysisTool` registry implemented with `ndvi` wrapped as the first tool.
-  - Deterministic `RuleBasedPlanner` correctly routes Vegetation queries to the NDVI execution engine, mapping optical bands correctly and generating grounded text from statistical evidence.
-  - Architecture fully prepared for an LLM provider drop-in.
-- Phase 4 Multimodal EO Intelligence & Real Analytical Tools implemented:
-  - Documented Model Selection strategy favoring deterministic scientific capability over generic VLMs to guarantee SAR and spatial accuracy without hallucination.
-  - Developed NDWI (Water Detection) and dual-pol Sentinel-1 SAR Backscatter pipelines.
-  - Tools `water_index` and `sar_analysis` fully registered and orchestrated.
-  - Established the `benchmark_queries.json` framework for future evaluation.
-- **Phase 1 & 2 & 3 & 4 & 5 Complete:**
-    - SatQuery now features a full UI with geospatial map overlays, multi-band GeoTIFF ingestion, rule-based query understanding, NDWI computation, SAR dual-pol (VV/VH) processing, and model-assisted natural language interpretation via a local LLM (`SmolLM-135M`).
-    - A custom `EvidenceValidator` intercepts and prevents numerical hallucinations.
-    - All commits are synced to `https://github.com/Rayhan-099/satquery-ai`.
-    - A robust end-to-end Playwright test suite verifies UI query capabilities.
-- **Phase 6 (Real Copernicus Integration) Complete:**
-    - Created `CopernicusDataProvider` for querying CDSE OData API.
-    - Built frontend Data Discovery UI for querying bounding boxes and dates.
-    - Prepared ingestion pipeline to construct valid stacked GeoTIFFs from individual CDSE S2 `.jp2` bands (download operations mock realistically via UUIDs if CDSE credentials are not provided).
-    - Documented actual evaluation status of BigEarthNet and VRSBench (deferred).
+- **Phase 1 (COMPLETE):** Initial FastAPI backend, scene ingestion, Rasterio metadata extraction, upload flow.
+- **Supabase Architecture Setup (COMPLETE):** PostgreSQL migration, `.env` security, `AGENTS.md` rules, Playwright tests.
+- **Phase 2 (COMPLETE):** Band semantics enforced. Optical NDVI pipeline implemented with GeoTIFF outputs and PNG visualization.
+- **Phase 3 (COMPLETE):** Query orchestrator implemented (`query → planner → plan → executor → tool → evidence → response`). Type-safe `AnalysisPlan` and `RuleBasedPlanner` with unsupported-query handling.
+- **Phase 4 (COMPLETE):** Multimodal EO intelligence. NDWI (water) and Sentinel-1 SAR dual-pol (VV/VH) backscatter pipelines implemented.
+- **Phase 5 (COMPLETE):** Model gateway with SmolLM-135M-Instruct. Evidence-number validation and deterministic fallback if hallucination occurs. 
+- **Phase 6 (COMPLETE - Fixed in Phase 7):** `CopernicusDataProvider` fetching CDSE OData API. Data discovery UI allows querying by bbox and dates. (Original mock ingestion was repaired).
+- **Phase 7 (COMPLETE):** Real CDSE ingestion implemented with Keycloak Auth token fetching and OData `$value` raster extraction. Strict fallback to `SYNTHETIC_FIXTURE` if credentials are missing to keep demos intact. Provenance tracking implemented in DB and UI.
 
-## Active Models
-- *SmolLM-135M (integrated for local natural language interpretation).*
+## What Actually Works
+- Local GeoTIFF ingestion with metadata extraction.
+- Natural language querying of scene features (Vegetation, Water).
+- Deterministic NDVI and NDWI calculations with spatial heatmaps.
+- Sentinel-1 SAR backscatter ingestion (VV/VH).
+- CDSE OData Discovery by bounding box, date, and sensor.
+- Provenance tracking (REAL vs SYNTHETIC vs LOCAL_UPLOAD).
+- End-to-end Playwright tests on frontend query UI.
 
-## Important Environment / Setup
-- **Dependencies:** Python 3.11+, Node 20+.
-- **Database Connection:** Driven via `DATABASE_URL` in `.env`.
-- *Never commit secrets.*
+## What Is Synthetic
+- CDSE Asset Download if `CDSE_USERNAME` and `CDSE_PASSWORD` are missing from `.env` will fallback to copying `dummy_multispectral.tif` or `dummy_sar.tif`, marking its source explicitly as `SYNTHETIC_FIXTURE` in the UI to avoid misleading users.
 
-## Known Problems
-- None yet.
+## What Uses Real Copernicus Data
+- Keycloak-authenticated CDSE downloads use the real OData `$value` endpoint to fetch the product, marked as `REAL_COPERNICUS`. (Requires valid credentials).
 
-## Decisions That Must Not Be Casually Reversed
-- **Deterministic First:** Do not replace deterministic geospatial tools (e.g., NDVI calculation) with VLM predictions.
-- **No Generic UI:** Do not use generic SaaS dashboard aesthetics. AWESOMEDESIGN.md must be followed strictly.
+## What Is Deferred
+- External User Authentication & RLS.
+- Training/Evaluation on BigEarthNet and VRSBench.
+- Persistent Cloud Storage (Supabase Storage) for TIFFs.
+
+## Current Tests
+- `pytest` suite covers backend EO algorithms, query planner, and the mock CDSE provider endpoints. 
+- Playwright E2E tests cover frontend search and querying.
+
+## Known Limitations
+- The CDSE OData `$value` download pulls the entire SAFE archive, which is very slow/large. In production, a node-traversal logic should extract only necessary `.jp2` files, but for the MVP without guaranteed credentials, the current fallback structure is used.
+- SmolLM-135M is very small and occasionally struggles with complex interpretations, relying on the deterministic fallback.
+
+## Next Recommended Phase
+- **Phase 8:** E2E Benchmark Evaluation. Build out the `benchmark_queries.json` framework and evaluate the system's accuracy against a fixed set of synthetic and real EO datasets, tuning the tool selection logic and model gateway.
+
+## Last Updated
+- 2026-09-06

@@ -13,6 +13,8 @@ class Scene(Base):
     width = Column(Float)
     height = Column(Float)
     source_uri = Column(String)
+    source_type = Column(String) # e.g. REAL_COPERNICUS, SYNTHETIC_FIXTURE, LOCAL_UPLOAD
     status = Column(String)
     bands_metadata = Column(JSON, default=list)
+    provenance = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

@@ -46,7 +46,10 @@ def ingest_discovered_scene(req: IngestRequest):
     
     try:
         # Download (or mock download) the asset
-        asset_path = provider.download_asset(req.product_id, upload_dir)
+        asset_info = provider.download_asset(req.product_id, upload_dir)
+        asset_path = asset_info["path"]
+        source_type = asset_info["source_type"]
+        provenance = asset_info["provenance"]
         
         # We need to ingest it similarly to how the /images/upload endpoint works
         # The upload endpoint calls geo.extract_metadata and saves to db
@@ -94,6 +97,8 @@ def ingest_discovered_scene(req: IngestRequest):
                 bounds=metadata["bounds"],
                 width=metadata["width"],
                 height=metadata["height"],
+                source_type=source_type,
+                provenance=provenance,
                 status="processing",
                 bands_metadata=metadata["bands_metadata"]
             )

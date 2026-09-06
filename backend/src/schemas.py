@@ -11,6 +11,8 @@ class SceneResponse(BaseModel):
     width: Optional[float]
     height: Optional[float]
     status: Optional[str]
+    source_type: Optional[str]
+    provenance: Optional[Dict[str, Any]] = {}
     bands_metadata: Optional[List[Dict[str, Any]]] = []
     
     class Config:

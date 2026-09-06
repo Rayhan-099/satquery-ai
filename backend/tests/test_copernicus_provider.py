@@ -43,7 +43,14 @@ def test_copernicus_download_mocked(mock_exists, mock_copy):
     with patch("src.providers.copernicus.httpx.Client.get") as mock_get:
         mock_get.return_value.json.return_value = {"Name": "S2A_MSIL2A_20230805"}
         
-        path = provider.download_asset("1234-abcd", "/tmp")
-        assert path.startswith("/tmp/scene_")
-        assert path.endswith(".tif")
-        mock_copy.assert_called_once()
+        # Make sure token is None to trigger fallback
+        with patch.object(provider, '_get_token', return_value=None):
+            result = provider.download_asset("1234-abcd", "/tmp")
+            
+            assert isinstance(result, dict)
+            path = result["path"]
+            assert path.startswith("/tmp/scene_")
+            assert path.endswith(".tif")
+            assert result["source_type"] == "SYNTHETIC_FIXTURE"
+            assert "description" in result["provenance"]
+            mock_copy.assert_called_once()
