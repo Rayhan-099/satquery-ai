@@ -1,2 +1,10 @@
 .env
 backend/uploads/
+
+# Database
+*.db
+*.sqlite
+
+# Benchmark Output
+benchmark_results.json
+
