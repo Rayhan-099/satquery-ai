@@ -115,9 +115,11 @@ class CopernicusDataProvider(EODataProvider):
             logger.warning(f"Could not determine product type: {e}")
             is_s1 = False
             
+        backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        source_dummy = os.path.join(backend_dir, "dummy_sar.tif" if is_s1 else "dummy_multispectral.tif")
+            
         if not token:
             # Fallback
-            source_dummy = "dummy_sar.tif" if is_s1 else "dummy_multispectral.tif"
             if os.path.exists(source_dummy):
                 shutil.copy(source_dummy, out_path)
             else:
@@ -152,7 +154,9 @@ class CopernicusDataProvider(EODataProvider):
             # we simulate success if the token is valid, proving the auth chain works.
             # (If the Keycloak token is valid, we would write the real stacked tif here).
             
-            source_dummy = "dummy_sar.tif" if is_s1 else "dummy_multispectral.tif"
+            if not os.path.exists(source_dummy):
+                raise FileNotFoundError(f"Missing synthetic fixture {source_dummy}")
+                
             shutil.copy(source_dummy, out_path)
             
             return {
