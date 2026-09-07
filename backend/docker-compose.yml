@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  satquery-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: satquery-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/uploads:/app/uploads
+      - ./data/satquery.db:/app/satquery.db
+    environment:
+      - DATABASE_URL=sqlite:///./satquery.db
+      - FRONTEND_URL=${FRONTEND_URL:-*}
+      - CDSE_USERNAME=${CDSE_USERNAME:-}
+      - CDSE_PASSWORD=${CDSE_PASSWORD:-}
