@@ -4,15 +4,15 @@ import path from 'path';
 test('Natural Language Query Flow - Multimodal', async ({ page }) => {
   await page.goto('http://localhost:3000');
   
-  // Open Workspace
-  await page.click('button:has-text("Open Workspace")');
+  // Initialize Workspace
+  await page.click('button:has-text("Initialize Workspace")');
 
   // 1. Upload optical scene
   const filePath = path.join(__dirname, '../../backend/dummy_multispectral.tif');
   await page.setInputFiles('input[type="file"]', filePath);
   
   await page.click('button:has-text("Extract Metadata")');
-  await expect(page.locator('textarea[placeholder="Ask about this scene…"]')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('textarea[placeholder="Enter natural language query..."]')).toBeVisible({ timeout: 10000 });
   
   // 2. Unsupported Query
   await page.fill('textarea', 'Where are the buildings?');

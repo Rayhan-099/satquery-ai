@@ -9,8 +9,8 @@ test('Golden Path E2E Workflow', async ({ page }) => {
   await page.goto('http://localhost:3000/');
   await expect(page.locator('text=SATQUERY AI').first()).toBeVisible();
 
-  // Open Workspace
-  await page.click('button:has-text("Open Workspace")');
+  // Initialize Workspace
+  await page.click('button:has-text("Initialize Workspace")');
 
   // 2. Load known scene (Local Upload of dummy_multispectral.tif)
   const filePath = path.join(__dirname, '../../backend/dummy_multispectral.tif');
@@ -20,7 +20,7 @@ test('Golden Path E2E Workflow', async ({ page }) => {
   await page.click('button:has-text("Extract Metadata")');
 
   // Wait for the query interface to appear, meaning scene is loaded
-  await expect(page.locator('textarea[placeholder="Ask about this scene…"]')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('textarea[placeholder="Enter natural language query..."]')).toBeVisible({ timeout: 10000 });
 
   // 3. Verify provenance
   // Since it was a local upload, it should say LOCAL_UPLOAD

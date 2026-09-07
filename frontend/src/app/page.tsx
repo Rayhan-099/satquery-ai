@@ -23,7 +23,6 @@ export default function Home() {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
 
   useEffect(() => {
-    // Health check on mount
     checkHealth()
       .then((res) => setApiStatus(res.status === "ok" ? "connected" : "disconnected"))
       .catch(() => setApiStatus("disconnected"));
@@ -46,7 +45,6 @@ export default function Home() {
     setAnalyzing(false);
   };
 
-  // Compute map bounds and overlay
   let mapBounds = null;
   if (scene?.bounds) {
     try {
@@ -59,7 +57,6 @@ export default function Home() {
     mapOverlay = `/api/${queryResponse.evidence.visualization_asset}`;
   }
 
-  // If workspace hasn't been explicitly opened and no scene is selected, show EmptyState
   if (!workspaceOpen && !scene) {
     return (
       <AppShell hasScene={false} apiStatus={apiStatus}>
@@ -72,35 +69,41 @@ export default function Home() {
     <AppShell hasScene={!!scene} apiStatus={apiStatus}>
       {/* LEFT PANEL: Scene & Discovery */}
       <div
+        className="fade-in"
         style={{
-          width: "320px",
-          borderRight: "1px solid var(--color-border-default)",
+          width: "340px",
+          borderRight: "1px solid var(--color-border-subtle)",
           display: "flex",
           flexDirection: "column",
           flexShrink: 0,
+          background: "var(--color-bg-secondary)",
+          zIndex: 10
         }}
       >
         <ScenePanel scene={scene} onSceneLoaded={handleSceneLoaded} />
       </div>
 
       {/* CENTER PANEL: Map */}
-      <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column", zIndex: 1 }}>
         <MapViewer bounds={mapBounds} evidenceOverlay={mapOverlay} />
       </div>
 
       {/* RIGHT PANEL: Query & Analysis */}
       <div
+        className="fade-in"
         style={{
-          width: "380px",
-          borderLeft: "1px solid var(--color-border-default)",
+          width: "400px",
+          borderLeft: "1px solid var(--color-border-subtle)",
           display: "flex",
           flexDirection: "column",
           flexShrink: 0,
           background: "var(--color-bg-secondary)",
           overflow: "auto",
+          boxShadow: "-10px 0 30px rgba(0,0,0,0.3)",
+          zIndex: 10
         }}
       >
-        <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {error && <ErrorState message={error} onDismiss={() => setError("")} />}
 
           {scene ? (
@@ -111,8 +114,8 @@ export default function Home() {
               onError={handleError}
             />
           ) : (
-            <div className="surface" style={{ padding: "1rem", textAlign: "center" }}>
-              <span className="label-sm">Select a scene to begin analysis</span>
+            <div className="surface" style={{ padding: "1.25rem", textAlign: "center" }}>
+              <span className="label-sm" style={{ color: "var(--color-text-tertiary)" }}>Select a scene to begin analysis</span>
             </div>
           )}
 
