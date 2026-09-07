@@ -5,8 +5,14 @@ import uuid
 from datetime import datetime
 
 from ..providers.copernicus import CopernicusDataProvider
+from ..database import get_db
+from ..models import Scene
+from ..utils.geo import extract_metadata
+from sqlalchemy.orm import Session
 import os
-import shutil
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/discovery", tags=["Discovery"])
 
@@ -36,80 +42,63 @@ def search_scenes(query: DiscoveryQuery):
         )
         return {"status": "success", "results": results}
     except Exception as e:
+        logger.error(f"CDSE search failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/ingest")
-def ingest_discovered_scene(req: IngestRequest):
+def ingest_discovered_scene(req: IngestRequest, db: Session = Depends(get_db)):
     provider = CopernicusDataProvider()
     upload_dir = "uploads"
     os.makedirs(upload_dir, exist_ok=True)
     
     try:
-        # Download (or mock download) the asset
+        # Download (or synthetic fallback) the asset
         asset_info = provider.download_asset(req.product_id, upload_dir)
         asset_path = asset_info["path"]
         source_type = asset_info["source_type"]
         provenance = asset_info["provenance"]
         
-        # We need to ingest it similarly to how the /images/upload endpoint works
-        # The upload endpoint calls geo.extract_metadata and saves to db
-        import logging
-        logger = logging.getLogger(__name__)
-        from ..utils.geo import extract_metadata
-        from ..database import get_db
-        from ..models import Scene
-        from sqlalchemy.orm import Session
+        metadata = extract_metadata(asset_path)
         
-        # We need a DB session. We can use a context manager or dependency injection
-        # But this is a simple route
-        db_gen = get_db()
-        db: Session = next(db_gen)
+        # Identify bands for S2 or S1 explicitly since we know what we downloaded
+        if req.sensor.lower() == "sentinel-2":
+            metadata["sensor"] = "sentinel-2"
+            metadata["bands_metadata"] = [
+                {"index": 1, "description": "Blue"},
+                {"index": 2, "description": "Green"},
+                {"index": 3, "description": "Red"},
+                {"index": 4, "description": "NIR"},
+            ]
+        elif req.sensor.lower() == "sentinel-1":
+            metadata["sensor"] = "sentinel-1"
+            metadata["bands_metadata"] = [
+                {"index": 1, "description": "VV"},
+                {"index": 2, "description": "VH"}
+            ]
+            
+        scene_id = os.path.basename(asset_path).replace(".tif", "")
         
-        try:
-            metadata = extract_metadata(asset_path)
-            
-            # Identify bands for S2 or S1 explicitly since we know what we downloaded
-            if req.sensor.lower() == "sentinel-2":
-                metadata["sensor"] = "sentinel-2"
-                metadata["bands_metadata"] = [
-                    {"index": 1, "description": "Blue"},
-                    {"index": 2, "description": "Green"},
-                    {"index": 3, "description": "Red"},
-                    {"index": 4, "description": "NIR"},
-                ]
-            elif req.sensor.lower() == "sentinel-1":
-                metadata["sensor"] = "sentinel-1"
-                metadata["bands_metadata"] = [
-                    {"index": 1, "description": "VV"},
-                    {"index": 2, "description": "VH"}
-                ]
-                
-            scene_id = os.path.basename(asset_path).replace(".tif", "")
-            
-            # Save to DB
-            db_scene = Scene(
-                id=scene_id,
-                filename=os.path.basename(asset_path),
-                path=asset_path,
-                sensor=metadata["sensor"],
-                acquisition_time=datetime.fromisoformat(metadata["acquisition_time"]) if metadata["acquisition_time"] else datetime.utcnow(),
-                crs=metadata["crs"],
-                bounds=metadata["bounds"],
-                width=metadata["width"],
-                height=metadata["height"],
-                source_type=source_type,
-                provenance=provenance,
-                status="processing",
-                bands_metadata=metadata["bands_metadata"]
-            )
-            db.add(db_scene)
-            db.commit()
-            db.refresh(db_scene)
-            
-            return db_scene
-            
-        finally:
-            db_gen.close()
+        # Save to DB using correct Scene model fields
+        db_scene = Scene(
+            id=scene_id,
+            sensor=metadata.get("sensor", "unknown"),
+            acquisition_time=datetime.utcnow(),
+            crs=metadata["crs"],
+            bounds=metadata["bounds"],
+            width=metadata["width"],
+            height=metadata["height"],
+            source_uri=asset_path,
+            source_type=source_type,
+            provenance=provenance,
+            status="processing",
+            bands_metadata=metadata["bands_metadata"]
+        )
+        db.add(db_scene)
+        db.commit()
+        db.refresh(db_scene)
+        
+        return db_scene
             
     except Exception as e:
+        logger.error(f"Discovery ingest failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))

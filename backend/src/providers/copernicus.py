@@ -1,9 +1,12 @@
 import os
 import shutil
 import uuid
+import logging
 import httpx
 import json
 from typing import List, Dict, Any
+
+logger = logging.getLogger(__name__)
 from .base import EODataProvider
 
 CDSE_ODATA_URL = "https://catalogue.dataspace.copernicus.eu/odata/v1/Products"
@@ -91,8 +94,8 @@ class CopernicusDataProvider(EODataProvider):
                 res = client.post(token_url, data=data, timeout=10.0)
                 if res.status_code == 200:
                     return res.json().get("access_token")
-        except:
-            pass
+        except Exception as e:
+            logger.warning(f"CDSE token request failed: {e}")
         return None
 
     def download_asset(self, product_id: str, output_dir: str) -> Dict[str, Any]:
@@ -108,7 +111,8 @@ class CopernicusDataProvider(EODataProvider):
             with httpx.Client() as client:
                 prod_info = client.get(f"{CDSE_ODATA_URL}({product_id})").json()
             is_s1 = "GRD" in prod_info.get("Name", "")
-        except:
+        except Exception as e:
+            logger.warning(f"Could not determine product type: {e}")
             is_s1 = False
             
         if not token:

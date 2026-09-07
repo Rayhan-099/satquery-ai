@@ -14,16 +14,27 @@ router = APIRouter(prefix="/images", tags=["images"])
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
+
 @router.post("/upload", response_model=SceneResponse)
 async def upload_image(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not file.filename.endswith(('.tif', '.tiff')):
-        raise HTTPException(status_code=400, detail="Only GeoTIFF files are supported")
+    filename = file.filename or ""
+    # Sanitize filename: reject path traversal and non-safe characters
+    if ".." in filename or "/" in filename or "\\" in filename:
+        raise HTTPException(status_code=400, detail="Invalid filename.")
+    if not filename.lower().endswith(('.tif', '.tiff')):
+        raise HTTPException(status_code=400, detail="Only GeoTIFF files are supported.")
+    
+    # Enforce file size limit
+    contents = await file.read()
+    if len(contents) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=413, detail=f"File too large. Maximum size is {MAX_UPLOAD_SIZE // (1024*1024)} MB.")
     
     scene_id = f"scene_{uuid.uuid4().hex[:8]}"
     file_path = os.path.join(UPLOAD_DIR, f"{scene_id}.tif")
     
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        buffer.write(contents)
         
     try:
         metadata = extract_metadata(file_path)
