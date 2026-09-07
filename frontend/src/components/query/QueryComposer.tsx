@@ -52,47 +52,42 @@ export default function QueryComposer({
 
   return (
     <div
-      className="surface slide-up delay-100"
+      className="surface slide-up stagger-1"
       style={{ padding: "1.25rem", position: "relative" }}
     >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <label className="label-xs" htmlFor="query-input" style={{ color: focused ? "var(--color-accent)" : "var(--color-text-secondary)", transition: "color var(--transition-fast)" }}>
+          ANALYTICAL COMMAND
+        </label>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <span className="badge badge-info" style={{ background: "transparent", border: "1px solid var(--color-border-strong)" }}>MODE: EO ANALYSIS</span>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <div>
-          <label className="label-xs" htmlFor="query-input" style={{ display: "block", marginBottom: 8, color: focused ? "var(--color-accent)" : "var(--color-text-tertiary)", transition: "color var(--transition-fast)" }}>
-            Command Interface
-          </label>
-          <div style={{ position: "relative" }}>
-            <textarea
-              id="query-input"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter natural language query..."
-              disabled={analyzing}
-              rows={2}
-              style={{
-                width: "100%",
-                padding: "0.75rem 1rem",
-                background: "var(--color-bg-primary)",
-                color: "var(--color-text-primary)",
-                fontFamily: "var(--font-sans)",
-                fontSize: "0.875rem",
-                border: "1px solid",
-                borderColor: focused ? "var(--color-accent)" : "var(--color-border-strong)",
-                borderRadius: "var(--radius-sm)",
-                resize: "vertical",
-                minHeight: "4rem",
-                transition: "all var(--transition-default)",
-                boxShadow: focused ? "0 0 15px rgba(45, 212, 191, 0.15), inset 0 2px 5px rgba(0,0,0,0.3)" : "inset 0 2px 5px rgba(0,0,0,0.2)",
-              }}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-            />
-          </div>
+        <div style={{ position: "relative" }}>
+          <textarea
+            id="query-input"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Enter natural language geospatial query..."
+            disabled={analyzing}
+            rows={2}
+            className="input-field"
+            style={{
+              resize: "vertical",
+              minHeight: "4.5rem",
+              fontSize: "0.875rem",
+            }}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
+          />
         </div>
 
         {!query && !analyzing && (
@@ -121,7 +116,14 @@ export default function QueryComposer({
           disabled={analyzing || !query.trim()}
           style={{ width: "100%", marginTop: "0.25rem" }}
         >
-          {analyzing ? "Analyzing..." : "Analyze"}
+          {analyzing ? (
+            <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div style={{ width: 12, height: 12, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+              EXECUTING
+            </span>
+          ) : (
+            "RUN ANALYSIS"
+          )}
         </button>
       </form>
     </div>

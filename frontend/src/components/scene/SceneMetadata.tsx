@@ -1,118 +1,115 @@
 "use client";
 
-import type { Scene } from "@/lib/types";
-
-interface ProvenanceBadgeProps {
-  sourceType: string | null;
-}
-
-export function ProvenanceBadge({ sourceType }: ProvenanceBadgeProps) {
-  const type = sourceType || "UNKNOWN";
-  let badgeClass = "badge badge-info";
-
-  if (type === "SYNTHETIC_FIXTURE") badgeClass = "badge badge-warning";
-  else if (type === "REAL_COPERNICUS") badgeClass = "badge badge-success";
-  else if (type === "LOCAL_UPLOAD") badgeClass = "badge badge-info";
-
-  return <span className={badgeClass} style={{ boxShadow: "0 0 10px currentColor inset", animation: "fadeIn 0.5s ease" }}>{type}</span>;
-}
+import type { Scene, BandMetadata } from "@/lib/types";
 
 interface SceneMetadataProps {
   scene: Scene;
 }
 
 export default function SceneMetadata({ scene }: SceneMetadataProps) {
-  let parsedBounds: { left: number; bottom: number; right: number; top: number } | null = null;
+  let bounds = null;
+  let bands: BandMetadata[] = [];
+
   try {
-    if (scene.bounds) parsedBounds = JSON.parse(scene.bounds);
+    if (scene.bounds) bounds = JSON.parse(scene.bounds);
+  } catch {}
+
+  try {
+    if (scene.bands_metadata) {
+      bands = typeof scene.bands_metadata === "string" 
+        ? JSON.parse(scene.bands_metadata as unknown as string) 
+        : scene.bands_metadata;
+    }
+  } catch {}
+
+  let provenance: Record<string, any> | null = null;
+  try {
+    if (scene.provenance) {
+      provenance = typeof scene.provenance === "string"
+        ? JSON.parse(scene.provenance as unknown as string)
+        : scene.provenance;
+    }
   } catch {}
 
   return (
-    <div className="fade-in" style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span className="mono-data" style={{ color: "var(--color-text-primary)", fontWeight: 600, fontSize: "0.875rem" }}>
-          {scene.id}
+    <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      {/* Header */}
+      <div className="fade-in stagger-1" style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+        <span className="label-xs">ACTIVE SCENE</span>
+        <span className="mono-data stat-value highlight" style={{ fontSize: "1.25rem" }}>
+          {scene.id.replace("scene_", "SCN-")}
         </span>
-        <ProvenanceBadge sourceType={scene.source_type} />
       </div>
 
-      <div className="divider" />
+      <div className="divider fade-in stagger-1" />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-        <MetaItem label="Sensor" value={scene.sensor || "unknown"} delay="100ms" />
-        <MetaItem label="CRS" value={scene.crs || "unknown"} delay="150ms" />
-        <MetaItem label="Dimensions" value={scene.width && scene.height ? `${scene.width} × ${scene.height}` : "—"} delay="200ms" />
-        <MetaItem label="Bands" value={scene.bands_metadata ? String(scene.bands_metadata.length) : "—"} delay="250ms" />
+      {/* Grid Data */}
+      <div className="fade-in stagger-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+        <div>
+          <span className="label-xs" style={{ display: "block", marginBottom: "0.25rem" }}>SENSOR</span>
+          <span className="mono-data">{!scene.sensor || scene.sensor === "unknown" ? "MULTISPECTRAL" : scene.sensor.toUpperCase()}</span>
+        </div>
+        <div>
+          <span className="label-xs" style={{ display: "block", marginBottom: "0.25rem" }}>CRS</span>
+          <span className="mono-data">{scene.crs}</span>
+        </div>
+        <div>
+          <span className="label-xs" style={{ display: "block", marginBottom: "0.25rem" }}>DIMENSIONS</span>
+          <span className="mono-data">{scene.width} × {scene.height} px</span>
+        </div>
+        <div>
+          <span className="label-xs" style={{ display: "block", marginBottom: "0.25rem" }}>BANDS</span>
+          <span className="mono-data">{bands.length}</span>
+        </div>
       </div>
 
-      {scene.bands_metadata && scene.bands_metadata.length > 0 && (
-        <>
-          <div className="divider" />
-          <div className="fade-in delay-200">
-            <div className="label-xs" style={{ marginBottom: 6 }}>Band Semantics</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
-              {scene.bands_metadata.map((b) => (
-                <span
-                  key={b.index}
-                  className="surface"
-                  style={{
-                    fontSize: "0.6875rem",
-                    fontFamily: "var(--font-mono)",
-                    padding: "0.125rem 0.5rem",
-                    color: "var(--color-accent)",
-                    border: "1px solid var(--color-border-strong)",
-                  }}
-                >
-                  B{b.index}: <span style={{ color: "var(--color-text-secondary)" }}>{b.description || b.color_interpretation || "unknown"}</span>
-                </span>
-              ))}
+      {/* Bands */}
+      {bands.length > 0 && (
+        <div className="fade-in stagger-3">
+          <span className="label-xs" style={{ display: "block", marginBottom: "0.5rem" }}>BAND SEMANTICS</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            {bands.map((b) => (
+              <span key={b.index} className="badge badge-info" style={{ textTransform: "none", letterSpacing: "0.02em" }}>
+                B{b.index} {b.description}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Spatial Extent */}
+      {bounds && (
+        <div className="fade-in stagger-4">
+          <span className="label-xs" style={{ display: "block", marginBottom: "0.5rem" }}>SPATIAL EXTENT</span>
+          <div className="surface-inset" style={{ padding: "0.75rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+            <div>
+              <div style={{ fontSize: "0.625rem", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>SW</div>
+              <div className="mono-data" style={{ fontSize: "0.75rem", color: "var(--color-text-secondary)" }}>
+                {bounds.left.toFixed(4)}, {bounds.bottom.toFixed(4)}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: "0.625rem", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>NE</div>
+              <div className="mono-data" style={{ fontSize: "0.75rem", color: "var(--color-text-secondary)" }}>
+                {bounds.right.toFixed(4)}, {bounds.top.toFixed(4)}
+              </div>
             </div>
           </div>
-        </>
+        </div>
       )}
 
-      {parsedBounds && (
-        <>
-          <div className="divider" />
-          <div className="fade-in delay-300">
-            <div className="label-xs" style={{ marginBottom: 6 }}>Spatial Bounds</div>
-            <code
-              className="mono-data surface"
-              style={{
-                display: "block",
-                fontSize: "0.75rem",
-                padding: "0.5rem 0.75rem",
-                color: "var(--color-text-primary)",
-                wordBreak: "break-all",
-                lineHeight: 1.6,
-                border: "1px solid var(--color-border-strong)",
-              }}
-            >
-              <span style={{ color: "var(--color-accent)" }}>SW</span> {parsedBounds.left.toFixed(4)}, {parsedBounds.bottom.toFixed(4)}
-              <br/>
-              <span style={{ color: "var(--color-accent)" }}>NE</span> {parsedBounds.right.toFixed(4)}, {parsedBounds.top.toFixed(4)}
-            </code>
-          </div>
-        </>
-      )}
-
-      {scene.provenance && typeof scene.provenance === "object" && !!(scene.provenance as Record<string, unknown>).description && (
-        <>
-          <div className="divider" />
-          <p className="fade-in delay-300" style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>
-            {String((scene.provenance as Record<string, string>).description)}
+      {/* Provenance */}
+      <div className="fade-in stagger-5">
+        <span className="label-xs" style={{ display: "block", marginBottom: "0.5rem" }}>PROVENANCE</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span className="badge badge-success">{scene.source_type}</span>
+        </div>
+        {provenance?.description && (
+          <p className="mono-data" style={{ fontSize: "0.6875rem", color: "var(--color-text-tertiary)", marginTop: "0.5rem", marginBottom: 0 }}>
+            {provenance.description}
           </p>
-        </>
-      )}
-    </div>
-  );
-}
-
-function MetaItem({ label, value, delay }: { label: string; value: string; delay: string }) {
-  return (
-    <div className="fade-in" style={{ animationDelay: delay }}>
-      <div className="label-xs">{label}</div>
-      <div className="mono-data" style={{ fontSize: "0.8125rem", marginTop: "2px", color: "var(--color-text-primary)" }}>{value}</div>
+        )}
+      </div>
     </div>
   );
 }

@@ -27,7 +27,15 @@ const MapContent = dynamic(() => import("./MapContent"), {
 
 export default function MapViewer({ bounds, evidenceOverlay }: MapViewerProps) {
   return (
-    <div className="fade-in" style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div className="fade-in" style={{ 
+      width: "100%", 
+      height: "100%", 
+      position: "relative",
+      background: "var(--color-bg-deep)",
+      overflow: "hidden",
+      borderRadius: "var(--radius-sm)",
+      boxShadow: "var(--shadow-inset-deep)"
+    }}>
       {bounds ? (
         <MapContent bounds={bounds} evidenceOverlay={evidenceOverlay} />
       ) : (
@@ -39,29 +47,43 @@ export default function MapViewer({ bounds, evidenceOverlay }: MapViewerProps) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            background: "var(--color-bg-primary)",
-            gap: "0.75rem",
+            background: "radial-gradient(circle at center, var(--color-bg-surface) 0%, var(--color-bg-deep) 100%)",
+            gap: "1rem",
           }}
         >
-          <span
-            className="mono-data"
-            style={{
-              fontSize: "0.8125rem",
-              color: "var(--color-text-tertiary)",
-              letterSpacing: "0.05em",
-            }}
-          >
-            AWAITING SCENE DATA
-          </span>
-          <span
-            style={{
-              fontSize: "0.75rem",
-              color: "var(--color-text-secondary)",
-              opacity: 0.7,
-            }}
-          >
-            Upload or discover a scene to initialize map
-          </span>
+          <div style={{
+            width: "48px",
+            height: "48px",
+            border: "1px dashed var(--color-border-strong)",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: 0.5
+          }}>
+            <div style={{ width: "4px", height: "4px", background: "var(--color-text-tertiary)", borderRadius: "50%" }} />
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <span
+              className="label-sm"
+              style={{
+                display: "block",
+                color: "var(--color-text-secondary)",
+                marginBottom: "0.25rem",
+              }}
+            >
+              NO ACTIVE SCENE
+            </span>
+            <span
+              className="mono-data"
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--color-text-tertiary)",
+              }}
+            >
+              WAITING FOR GEOSPATIAL INPUT
+            </span>
+          </div>
         </div>
       )}
 
@@ -70,31 +92,60 @@ export default function MapViewer({ bounds, evidenceOverlay }: MapViewerProps) {
         position: "absolute",
         top: 0, left: 0, right: 0, bottom: 0,
         pointerEvents: "none",
-        boxShadow: "inset 0 0 30px rgba(5, 8, 15, 0.8)",
+        boxShadow: evidenceOverlay 
+          ? "inset 0 0 50px rgba(45, 212, 191, 0.1), inset 0 0 0 1px var(--color-accent-muted)"
+          : "inset 0 0 40px rgba(3, 5, 8, 0.9)",
+        transition: "box-shadow var(--transition-slow)",
         zIndex: 400
       }} />
+
+      {/* Active Evidence Focus Frame */}
+      {evidenceOverlay && (
+        <div style={{
+          position: "absolute",
+          top: "1rem", left: "1rem", right: "1rem", bottom: "1rem",
+          pointerEvents: "none",
+          border: "1px solid var(--color-accent-muted)",
+          zIndex: 401
+        }}>
+          {/* Corner brackets */}
+          <div style={{ position: "absolute", top: -1, left: -1, width: 16, height: 16, borderTop: "2px solid var(--color-accent)", borderLeft: "2px solid var(--color-accent)" }} />
+          <div style={{ position: "absolute", top: -1, right: -1, width: 16, height: 16, borderTop: "2px solid var(--color-accent)", borderRight: "2px solid var(--color-accent)" }} />
+          <div style={{ position: "absolute", bottom: -1, left: -1, width: 16, height: 16, borderBottom: "2px solid var(--color-accent)", borderLeft: "2px solid var(--color-accent)" }} />
+          <div style={{ position: "absolute", bottom: -1, right: -1, width: 16, height: 16, borderBottom: "2px solid var(--color-accent)", borderRight: "2px solid var(--color-accent)" }} />
+          
+          <div className="badge badge-accent fade-in" style={{ position: "absolute", top: -8, left: 24, background: "var(--color-bg-deep)" }}>
+            ACTIVE ANALYSIS
+          </div>
+        </div>
+      )}
 
       {/* Coordinates indicator */}
       {bounds && (
         <div
-          className="fade-in slide-up delay-200"
+          className="fade-in stagger-2"
           style={{
             position: "absolute",
-            bottom: 12,
-            left: 12,
+            bottom: "1rem",
+            left: "1rem",
             zIndex: 1000,
-            padding: "0.375rem 0.75rem",
-            background: "rgba(5, 8, 15, 0.75)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
+            padding: "0.5rem 0.875rem",
+            background: "rgba(3, 5, 8, 0.8)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
             borderRadius: "var(--radius-sm)",
             border: "1px solid var(--color-border-subtle)",
-            boxShadow: "var(--shadow-surface)"
+            borderTop: "1px solid var(--color-border-default)",
+            boxShadow: "var(--shadow-surface)",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem"
           }}
         >
-          <span className="mono-data" style={{ fontSize: "0.625rem", color: "var(--color-accent)" }}>
+          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--color-accent)", boxShadow: "var(--shadow-glow)" }} />
+          <span className="mono-data" style={{ fontSize: "0.6875rem", color: "var(--color-text-secondary)" }}>
             {bounds.left.toFixed(4)}, {bounds.bottom.toFixed(4)} 
-            <span style={{ color: "var(--color-text-tertiary)", margin: "0 4px" }}>→</span> 
+            <span style={{ color: "var(--color-text-tertiary)", margin: "0 0.5rem" }}>/</span> 
             {bounds.right.toFixed(4)}, {bounds.top.toFixed(4)}
           </span>
         </div>

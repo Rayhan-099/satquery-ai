@@ -117,26 +117,41 @@ export default function ScenePanel({ scene, onSceneLoaded }: ScenePanelProps) {
         )}
 
         {activeTab === "upload" ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="fade-in stagger-1" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={(e) => { e.preventDefault(); setIsDragging(false); if (e.dataTransfer.files?.[0]) setFile(e.dataTransfer.files[0]); }}
               style={{
-                border: isDragging ? "1px solid var(--color-interactive)" : "1px dashed var(--color-border-strong)",
+                position: "relative",
+                border: "1px solid",
+                borderColor: isDragging || file ? "var(--color-accent)" : "var(--color-border-strong)",
                 padding: "2rem 1.5rem",
                 textAlign: "center",
                 cursor: "pointer",
-                background: isDragging ? "rgba(14, 165, 233, 0.05)" : "var(--color-bg-primary)",
-                borderRadius: "var(--radius-sm)",
-                transition: "all var(--transition-default)",
-                boxShadow: isDragging ? "0 0 15px rgba(14, 165, 233, 0.2) inset" : "none",
+                background: isDragging ? "var(--color-accent-muted)" : "var(--color-bg-deep)",
+                borderRadius: "var(--radius-md)",
+                transition: "all var(--transition-slow)",
+                boxShadow: (isDragging || file) ? "var(--shadow-glow), inset 0 2px 10px rgba(0,0,0,0.5)" : "var(--shadow-inset-deep)",
+                transform: isDragging ? "scale(0.99)" : "scale(1)",
               }}
               role="button"
               tabIndex={0}
               aria-label="Select GeoTIFF file to upload"
               onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+              onMouseEnter={(e) => {
+                if (!isDragging && !file) {
+                  e.currentTarget.style.borderColor = "var(--color-border-glow)";
+                  e.currentTarget.style.boxShadow = "var(--shadow-glow), var(--shadow-inset-deep)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isDragging && !file) {
+                  e.currentTarget.style.borderColor = "var(--color-border-strong)";
+                  e.currentTarget.style.boxShadow = "var(--shadow-inset-deep)";
+                }
+              }}
             >
               <input
                 ref={fileInputRef}
@@ -145,19 +160,43 @@ export default function ScenePanel({ scene, onSceneLoaded }: ScenePanelProps) {
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 style={{ display: "none" }}
               />
-              <p style={{ 
-                fontSize: "0.8125rem", 
-                color: file ? "var(--color-accent)" : "var(--color-text-tertiary)", 
-                margin: 0, 
-                wordBreak: "break-all",
-                fontWeight: file ? 500 : 400
-              }}>
-                {file ? file.name : "Drag GeoTIFF here or click to browse"}
-              </p>
+              
+              {!file ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  <div style={{ width: "32px", height: "32px", margin: "0 auto", border: "1px solid var(--color-border-strong)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-bg-surface)" }}>
+                    <div style={{ width: "8px", height: "8px", background: "var(--color-text-tertiary)", borderRadius: "1px" }} />
+                  </div>
+                  <p className="label-xs" style={{ margin: 0, color: "var(--color-text-secondary)" }}>
+                    ACQUISITION BAY
+                  </p>
+                  <p style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)", margin: 0, fontFamily: "var(--font-mono)" }}>
+                    Click or drag GeoTIFF
+                  </p>
+                </div>
+              ) : (
+                <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "center" }}>
+                  <span className="badge badge-success">READY</span>
+                  <p className="mono-data" style={{ 
+                    color: "var(--color-text-primary)", 
+                    margin: 0, 
+                    wordBreak: "break-all",
+                    fontWeight: 500,
+                    fontSize: "0.875rem"
+                  }}>
+                    {file.name}
+                  </p>
+                  <div style={{ display: "flex", gap: "1rem", opacity: 0.8 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <span className="label-xs">SIZE</span>
+                      <span className="mono-data" style={{ fontSize: "0.75rem" }}>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button className="btn-primary" onClick={handleUpload} disabled={!file || loading} style={{ width: "100%" }}>
-              {loading ? "Extracting..." : "Extract Metadata"}
+              {loading ? "EXTRACTING METADATA..." : "EXTRACT METADATA"}
             </button>
           </div>
         ) : (

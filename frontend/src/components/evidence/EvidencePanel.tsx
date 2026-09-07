@@ -16,7 +16,7 @@ function ConfidenceIndicator({ evidence }: { evidence: Evidence }) {
   else if (validPixels < 100) level = "Low";
 
   const colors = {
-    High: { bg: "var(--color-success-muted)", color: "var(--color-success)", border: "rgba(34, 197, 94, 0.4)" },
+    High: { bg: "var(--color-success-muted)", color: "var(--color-success)", border: "rgba(16, 185, 129, 0.4)" },
     Medium: { bg: "var(--color-warning-muted)", color: "var(--color-warning)", border: "rgba(245, 158, 11, 0.4)" },
     Low: { bg: "var(--color-error-muted)", color: "var(--color-error)", border: "rgba(239, 68, 68, 0.4)" },
   };
@@ -24,25 +24,19 @@ function ConfidenceIndicator({ evidence }: { evidence: Evidence }) {
   const c = colors[level];
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-      <span className="label-xs">Confidence</span>
-      <span
+    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+      <span className="label-xs" style={{ color: "var(--color-text-secondary)" }}>CONFIDENCE</span>
+      <div
+        className="badge"
         style={{
-          fontSize: "0.625rem",
-          fontWeight: 600,
-          padding: "0.125rem 0.5rem",
           background: c.bg,
           color: c.color,
-          border: `1px solid ${c.border}`,
-          borderRadius: "12px",
-          textTransform: "uppercase",
-          letterSpacing: "0.06em",
-          boxShadow: `0 0 10px ${c.bg}`,
-          animation: "fadeIn 0.5s ease"
+          borderColor: c.border,
+          boxShadow: `inset 0 1px 4px rgba(0,0,0,0.5)`,
         }}
       >
         {level}
-      </span>
+      </div>
     </div>
   );
 }
@@ -53,13 +47,13 @@ function ExecutionTrace({ response }: { response: QueryResponse }) {
   const evidence = response.evidence;
 
   return (
-    <div style={{ marginTop: "1rem" }}>
+    <div style={{ marginTop: "1.5rem" }}>
       <button
         onClick={() => setExpanded(!expanded)}
         style={{
           background: "none",
           border: "none",
-          color: "var(--color-accent)",
+          color: "var(--color-text-secondary)",
           fontSize: "0.6875rem",
           cursor: "pointer",
           padding: "0.25rem 0",
@@ -72,46 +66,42 @@ function ExecutionTrace({ response }: { response: QueryResponse }) {
           gap: "0.5rem"
         }}
         onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-primary)")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
+        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-secondary)")}
       >
-        <span>{expanded ? "−" : "+"}</span> {expanded ? "Hide Trace" : "View Execution Trace"}
+        <span style={{ color: "var(--color-accent)" }}>{expanded ? "[-]" : "[+]"}</span> EXECUTION TRACE
       </button>
 
       {expanded && plan && (
         <div
-          className="slide-up"
+          className="surface-inset slide-up"
           style={{
             marginTop: "0.75rem",
-            padding: "0.75rem",
-            background: "rgba(0,0,0,0.2)",
-            border: "1px solid var(--color-border-strong)",
-            borderRadius: "var(--radius-sm)",
+            padding: "1rem",
             display: "flex",
             flexDirection: "column",
-            gap: "0.5rem",
-            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
+            gap: "0.75rem",
           }}
         >
-          <TraceRow label="Query" value={response.query} delay="0ms" />
-          <TraceRow label="Intent" value={plan.intent} delay="50ms" />
-          <TraceRow label="Tool" value={plan.tool} delay="100ms" />
-          {evidence && <TraceRow label="Analysis" value={evidence.analysis_type} delay="150ms" />}
-          {evidence && <TraceRow label="Formula" value={evidence.formula} delay="200ms" />}
+          <TraceRow label="QUERY" value={response.query} delay="0ms" />
+          <TraceRow label="INTENT" value={plan.intent} delay="50ms" />
+          <TraceRow label="TOOL" value={plan.tool} delay="100ms" />
+          {evidence && <TraceRow label="ANALYSIS" value={evidence.analysis_type} delay="150ms" />}
+          {evidence && <TraceRow label="FORMULA" value={evidence.formula} delay="200ms" />}
           {evidence && Object.entries(evidence.input_bands).map(([k, v], idx) => (
-            <TraceRow key={k} label={`Input: ${k}`} value={v} delay={`${250 + idx * 50}ms`} />
+            <TraceRow key={k} label={`INPUT: ${k}`} value={v} delay={`${250 + idx * 50}ms`} />
           ))}
-          <TraceRow label="Validation" value="Numerical claims grounded" delay="350ms" />
+          <TraceRow label="VALIDATION" value="Numerical claims grounded" delay="350ms" color="var(--color-success)" />
         </div>
       )}
     </div>
   );
 }
 
-function TraceRow({ label, value, delay }: { label: string; value: string; delay: string }) {
+function TraceRow({ label, value, delay, color = "var(--color-text-primary)" }: { label: string; value: string; delay: string; color?: string }) {
   return (
     <div className="fade-in" style={{ display: "flex", gap: "1rem", alignItems: "baseline", animationDelay: delay }}>
-      <span className="label-xs" style={{ flexShrink: 0, minWidth: 80, color: "var(--color-interactive)" }}>{label}</span>
-      <span className="mono-data" style={{ fontSize: "0.6875rem", color: "var(--color-text-secondary)" }}>{value}</span>
+      <span className="label-xs" style={{ flexShrink: 0, minWidth: 80, color: "var(--color-text-tertiary)" }}>{label}</span>
+      <span className="mono-data" style={{ fontSize: "0.75rem", color }}>{value}</span>
     </div>
   );
 }
@@ -128,16 +118,16 @@ export default function EvidencePanel({ response }: EvidencePanelProps) {
   const isSAR = evidence.analysis_type === "SAR Analysis";
 
   return (
-    <div className="surface slide-up delay-200" style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div className="surface slide-up stagger-3" style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span className="badge badge-accent">Analysis Complete</span>
+        <span className="badge badge-accent">ANALYSIS COMPLETE</span>
         <ConfidenceIndicator evidence={evidence} />
       </div>
 
       {/* Interpretation */}
       {response.interpretation && (
-        <p className="fade-in delay-300" style={{ fontSize: "0.875rem", color: "var(--color-text-primary)", margin: 0, lineHeight: 1.65 }}>
+        <p className="fade-in delay-200" style={{ fontSize: "0.875rem", color: "var(--color-text-primary)", margin: 0, lineHeight: 1.65 }}>
           {response.interpretation}
         </p>
       )}
@@ -146,24 +136,24 @@ export default function EvidencePanel({ response }: EvidencePanelProps) {
 
       {/* Statistics */}
       <div className="fade-in delay-300">
-        <div className="label-xs" style={{ marginBottom: "0.75rem", color: "var(--color-text-secondary)" }}>Evidence Statistics</div>
+        <div className="label-xs" style={{ marginBottom: "1rem", color: "var(--color-text-secondary)" }}>EVIDENCE STATISTICS</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           {isOptical && (
             <>
-              {stats.mean !== undefined && <StatBlock label={evidence.analysis_type} value={stats.mean.toFixed(4)} sublabel="Mean" delay="400ms" />}
-              {stats.max !== undefined && <StatBlock label="Max" value={stats.max.toFixed(4)} delay="450ms" />}
-              {stats.median !== undefined && <StatBlock label="Median" value={stats.median.toFixed(4)} delay="500ms" />}
-              {stats.std_dev !== undefined && <StatBlock label="Std Dev" value={stats.std_dev.toFixed(4)} delay="550ms" />}
+              {stats.mean !== undefined && <StatBlock label={evidence.analysis_type.toUpperCase()} value={stats.mean.toFixed(4)} sublabel="MEAN" delay="100ms" highlight />}
+              {stats.max !== undefined && <StatBlock label="MAXIMUM" value={stats.max.toFixed(4)} delay="150ms" />}
+              {stats.median !== undefined && <StatBlock label="MEDIAN" value={stats.median.toFixed(4)} delay="200ms" />}
+              {stats.std_dev !== undefined && <StatBlock label="STD DEV" value={stats.std_dev.toFixed(4)} delay="250ms" />}
             </>
           )}
           {isSAR && (
             <>
-              {stats.vv_mean !== undefined && <StatBlock label="VV Mean" value={stats.vv_mean.toFixed(4)} delay="400ms" />}
-              {stats.vh_mean !== undefined && <StatBlock label="VH Mean" value={stats.vh_mean.toFixed(4)} delay="450ms" />}
-              {stats.ratio_mean !== undefined && <StatBlock label="VV/VH Ratio" value={stats.ratio_mean.toFixed(4)} delay="500ms" />}
+              {stats.vv_mean !== undefined && <StatBlock label="VV MEAN" value={stats.vv_mean.toFixed(4)} delay="100ms" />}
+              {stats.vh_mean !== undefined && <StatBlock label="VH MEAN" value={stats.vh_mean.toFixed(4)} delay="150ms" />}
+              {stats.ratio_mean !== undefined && <StatBlock label="VV/VH RATIO" value={stats.ratio_mean.toFixed(4)} delay="200ms" highlight />}
             </>
           )}
-          {stats.valid_pixels !== undefined && <StatBlock label="Valid Pixels" value={stats.valid_pixels.toLocaleString()} delay="600ms" />}
+          {stats.valid_pixels !== undefined && <StatBlock label="VALID PIXELS" value={stats.valid_pixels.toLocaleString()} delay="300ms" />}
         </div>
       </div>
 
@@ -172,15 +162,15 @@ export default function EvidencePanel({ response }: EvidencePanelProps) {
       {/* Evidence metadata */}
       <div className="fade-in delay-300" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div className="label-xs" style={{ color: "var(--color-text-secondary)" }}>
-          Spatial {evidence.analysis_type.toLowerCase()} mask
+          SPATIAL {evidence.analysis_type.toUpperCase()} MASK
         </div>
         <a
           href={downloadUrl}
           download
           className="btn-secondary"
-          style={{ fontSize: "0.625rem", padding: "0.375rem 0.75rem" }}
+          style={{ fontSize: "0.6875rem", padding: "0.375rem 0.75rem" }}
         >
-          Export .tif
+          EXPORT .TIF
         </a>
       </div>
 
@@ -189,19 +179,19 @@ export default function EvidencePanel({ response }: EvidencePanelProps) {
   );
 }
 
-function StatBlock({ label, value, sublabel, delay }: { label: string; value: string; sublabel?: string; delay: string }) {
+function StatBlock({ label, value, sublabel, delay, highlight = false }: { label: string; value: string; sublabel?: string; delay: string; highlight?: boolean }) {
   return (
-    <div className="fade-in" style={{ 
+    <div className="fade-in surface-inset" style={{ 
       animationDelay: delay,
-      background: "var(--color-bg-primary)",
-      padding: "0.75rem",
-      borderRadius: "var(--radius-sm)",
-      border: "1px solid var(--color-border-subtle)",
-      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.02)"
+      padding: "1rem",
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.25rem",
+      borderTop: highlight ? "1px solid var(--color-accent)" : "1px solid var(--color-border-subtle)"
     }}>
-      <div className="label-xs" style={{ color: "var(--color-text-secondary)" }}>{label}</div>
-      <div className="stat-value" style={{ marginTop: "0.25rem" }}>{value}</div>
-      {sublabel && <div style={{ fontSize: "0.625rem", color: "var(--color-text-tertiary)", marginTop: "0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{sublabel}</div>}
+      <div className="label-xs" style={{ color: "var(--color-text-tertiary)" }}>{label}</div>
+      <div className={`stat-value ${highlight ? 'highlight' : ''}`}>{value}</div>
+      {sublabel && <div className="label-xs" style={{ color: "var(--color-text-tertiary)", marginTop: "0.25rem" }}>{sublabel}</div>}
     </div>
   );
 }

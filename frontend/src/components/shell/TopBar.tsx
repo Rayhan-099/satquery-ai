@@ -19,7 +19,7 @@ export default function TopBar({ hasScene, apiStatus }: TopBarProps) {
 
   return (
     <header
-      className="fade-in delay-100"
+      className="fade-in"
       style={{
         display: "flex",
         alignItems: "center",
@@ -27,21 +27,28 @@ export default function TopBar({ hasScene, apiStatus }: TopBarProps) {
         padding: "0 1.5rem",
         height: "3.5rem",
         borderBottom: "1px solid var(--color-border-subtle)",
-        background: "rgba(10, 15, 28, 0.7)",
+        background: "rgba(3, 5, 8, 0.6)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         flexShrink: 0,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
         position: "relative",
         zIndex: 50,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        {/* Subtle application identity mark */}
+        <div style={{ 
+          width: "16px", height: "16px", 
+          borderRadius: "2px", 
+          background: "linear-gradient(135deg, var(--color-accent) 0%, var(--color-interactive) 100%)",
+          boxShadow: "var(--shadow-glow)"
+        }} />
         <h1
           style={{
             fontSize: "1rem",
-            fontWeight: 700,
-            letterSpacing: "-0.02em",
+            fontWeight: 600,
+            letterSpacing: "0.02em",
             color: "var(--color-text-primary)",
             margin: 0,
             display: "flex",
@@ -49,33 +56,33 @@ export default function TopBar({ hasScene, apiStatus }: TopBarProps) {
             gap: "0.75rem",
           }}
         >
-          SATQUERY AI
+          SATQUERY
           <span
+            className="label-xs"
             style={{
-              fontSize: "0.6875rem",
-              color: "var(--color-text-tertiary)",
-              letterSpacing: "0.05em",
-              fontWeight: 500,
               borderLeft: "1px solid var(--color-border-strong)",
               paddingLeft: "0.75rem",
+              color: "var(--color-text-secondary)"
             }}
           >
-            Interactive Remote Sensing Intelligence
+            Geospatial Intelligence
           </span>
         </h1>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-        <span
-          className="mono-data"
-          style={{
-            fontSize: "0.6875rem",
-            color: "var(--color-text-secondary)",
-            letterSpacing: "0.04em",
-          }}
-        >
-          SIH26167
-        </span>
+        {/* Environment metadata */}
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <span className="label-xs" style={{ color: "var(--color-text-tertiary)" }}>ENV</span>
+          <span className="mono-data" style={{ fontSize: "0.6875rem", color: "var(--color-text-secondary)" }}>LOCAL / CDSE</span>
+          <div style={{ width: "1px", height: "12px", background: "var(--color-border-strong)" }} />
+          <span className="label-xs" style={{ color: "var(--color-text-tertiary)" }}>SCENE</span>
+          <span className="mono-data" style={{ fontSize: "0.6875rem", color: hasScene ? "var(--color-accent)" : "var(--color-text-secondary)" }}>
+            {hasScene ? "READY" : "AWAITING"}
+          </span>
+        </div>
+
+        {/* API Status Badge */}
         <div
           style={{
             display: "flex",
@@ -83,18 +90,17 @@ export default function TopBar({ hasScene, apiStatus }: TopBarProps) {
             gap: "0.5rem",
             fontSize: "0.6875rem",
             fontFamily: "var(--font-mono)",
-            fontWeight: 500,
+            fontWeight: 600,
             color: isConnected ? "var(--color-text-primary)" : "var(--color-text-tertiary)",
-            background: "rgba(0,0,0,0.2)",
+            background: "var(--color-bg-deep)",
             padding: "0.25rem 0.75rem",
-            borderRadius: "12px",
+            borderRadius: "4px",
             border: "1px solid var(--color-border-default)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.02)",
+            boxShadow: "var(--shadow-inset-deep)",
           }}
         >
           API
           <span
-            className={isConnected ? "pulse-glow" : ""}
             style={{
               width: 6,
               height: 6,

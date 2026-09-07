@@ -7,16 +7,17 @@ export default function InsufficientEvidence({
 }) {
   return (
     <div
-      className="surface slide-up delay-200"
+      className="surface-inset slide-up stagger-3"
       style={{
         padding: "1.25rem",
         borderColor: "rgba(245, 158, 11, 0.4)",
         boxShadow: "0 0 20px rgba(245, 158, 11, 0.1), inset 0 0 0 1px rgba(245, 158, 11, 0.1)",
+        background: "radial-gradient(circle at top left, rgba(245, 158, 11, 0.05), transparent 50%) var(--color-bg-deep)",
       }}
     >
       <div className="label-sm" style={{ color: "var(--color-warning)", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-        <span style={{ width: 6, height: 6, background: "var(--color-warning)", borderRadius: "50%", display: "inline-block", boxShadow: "0 0 8px var(--color-warning)" }} />
-        <span>Insufficient Evidence</span>
+        <span style={{ width: 6, height: 6, background: "var(--color-warning)", borderRadius: "50%", display: "inline-block", boxShadow: "0 0 8px var(--color-warning)", animation: "pulseGlow 2s infinite" }} />
+        <span>INSUFFICIENT EVIDENCE</span>
       </div>
 
       <p
@@ -33,20 +34,20 @@ export default function InsufficientEvidence({
 
       <div style={{ marginBottom: "1rem" }}>
         <div className="label-xs" style={{ marginBottom: "0.5rem", color: "var(--color-text-secondary)" }}>
-          Available capabilities
+          AVAILABLE CAPABILITIES
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
           {["Vegetation analysis (NDVI)", "Water detection (NDWI)", "SAR backscatter (VV/VH)"].map(
             (cap, i) => (
               <span
                 key={cap}
-                className="fade-in"
+                className="fade-in mono-data"
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "0.6875rem",
                   color: "var(--color-text-secondary)",
                   paddingLeft: "1rem",
                   position: "relative",
-                  animationDelay: `${300 + i * 100}ms`
+                  animationDelay: `${100 + i * 50}ms`
                 }}
               >
                 <span
@@ -58,29 +59,31 @@ export default function InsufficientEvidence({
                 >
                   ›
                 </span>
-                {cap}
+                {cap.toUpperCase()}
               </span>
             )
           )}
         </div>
       </div>
 
-      <div className="divider" style={{ marginBottom: "0.75rem" }} />
+      <div className="divider" style={{ marginBottom: "0.75rem", background: "linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.3), transparent)" }} />
 
-      <div className="label-xs" style={{ marginBottom: "0.5rem", color: "var(--color-text-tertiary)" }}>
-        System trace
+      <div className="label-xs" style={{ marginBottom: "0.5rem", color: "var(--color-warning)" }}>
+        SYSTEM TRACE
       </div>
       <code
-        className="mono-data fade-in delay-500"
+        className="mono-data fade-in delay-300"
         style={{
           fontSize: "0.6875rem",
           color: "var(--color-warning)",
           wordBreak: "break-all",
           display: "block",
-          background: "rgba(0,0,0,0.2)",
-          padding: "0.5rem",
+          background: "rgba(0,0,0,0.4)",
+          padding: "0.75rem",
           borderRadius: "var(--radius-sm)",
-          border: "1px solid rgba(245, 158, 11, 0.2)"
+          border: "1px solid rgba(245, 158, 11, 0.2)",
+          borderLeft: "2px solid var(--color-warning)",
+          boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)"
         }}
       >
         {limitations[0]}
