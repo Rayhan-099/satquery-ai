@@ -14,7 +14,7 @@ SatQuery AI demonstrates an evidence-grounded, natural-language copilot for Eart
 *Talking Point:* "All imagery in SatQuery is explicitly tagged with its provenance. Here you can see it's marked as `LOCAL_UPLOAD` (or `REAL_COPERNICUS` / `SYNTHETIC_FIXTURE`), ensuring the analyst always knows exactly where the data came from."
 
 ### 2. Demo Query 1 (Optical / NDVI)
-*Action:* Click the suggested query: **"Where is vegetation strongest?"** and click Submit.
+*Action:* Click the suggested query: **"Where is vegetation strongest?"** and click Analyze.
 *Wait ~15-20s (first inference latency) while the skeleton loader plays.*
 *Talking Point:* "SatQuery translates the natural language intent into a deterministic analysis plan. It selects the NDVI tool and computes it across the scene. The LLM then generates an explanation, but it is strictly audited by our `EvidenceValidator` to ensure no numerical hallucinations."
 
@@ -23,7 +23,7 @@ SatQuery AI demonstrates an evidence-grounded, natural-language copilot for Eart
 *Talking Point:* "The system is modality-aware. It recognizes SAR terminology and routes this to the Sentinel-1 pipeline to process VV and VH polarizations, producing an RGB composite evidence layer."
 
 ### 4. Demo Query 3 (Safety / Refusal)
-*Action:* Enter: **"What exact crop species are growing here?"**
+*Action:* Enter: **"What exact crop species are growing here?"** and click Analyze.
 *Talking Point:* "Scientific integrity requires saying 'I don't know'. SatQuery refuses to guess crop species because it lacks the specific hyperspectral or temporal evidence required, cleanly returning an 'Insufficient Evidence' state instead of hallucinating."
 
 ## Expected Results
