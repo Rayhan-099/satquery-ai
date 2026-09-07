@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_API_URL = process.env.BACKEND_API_URL || 'http://161.118.164.37:8000';
+const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +8,14 @@ async function handleRequest(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> | { path: string[] } }
 ) {
+  if (!BACKEND_API_URL) {
+    console.error('BACKEND_API_URL environment variable is not set.');
+    return NextResponse.json(
+      { detail: 'Service temporarily unavailable.' },
+      { status: 503 }
+    );
+  }
+
   const resolvedParams = await params;
   const pathString = resolvedParams.path.join('/');
   const searchParams = request.nextUrl.search;
@@ -17,7 +25,7 @@ async function handleRequest(
   const headers = new Headers(request.headers);
   headers.delete('host');
   headers.delete('connection');
-  headers.delete('expect'); // Fixes Node fetch 'expect' header error
+  headers.delete('expect');
 
   const fetchOptions: RequestInit = {
     method: request.method,
@@ -44,8 +52,8 @@ async function handleRequest(
   } catch (error) {
     console.error('API Proxy Error:', error);
     return NextResponse.json(
-      { detail: 'Internal Server Error (Proxy)', error: String(error), cause: error.cause ? String(error.cause) : undefined },
-      { status: 500 }
+      { detail: 'Backend service unavailable.' },
+      { status: 502 }
     );
   }
 }
